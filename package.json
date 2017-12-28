@@ -10,11 +10,16 @@
     "test": "jest"
   },
   "license": "MIT",
+  "peerDependencies": {
+    "semantic-release": "^11.1.0"
+  },
   "devDependencies": {
     "husky": "^0.14.3",
     "jest": "^22.0.4",
     "lint-staged": "^6.0.0",
-    "prettier": "^1.9.2"
+    "prettier": "^1.9.2",
+    "semantic-release": "^11.1.0",
+    "semantic-release-github-pr": "^1.1.5"
   },
   "dependencies": {
     "import-from": "^2.1.0",
