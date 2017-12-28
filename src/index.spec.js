@@ -3,16 +3,17 @@ const { pluginsFromTypeConfig, wrapPlugin, wrapMultiPlugin } = require('.');
 describe('Semantic Release Plugin Utils', () => {
   describe('#pluginsFromTypeConfig', () => {
     describe('when passed a release config', () => {
-      describe('and the config is empty', () => {
+      describe('and the config is empty/undefined/null', () => {
         it('returns an empty array', () => {
           expect(pluginsFromTypeConfig({})).toEqual([]);
+          expect(pluginsFromTypeConfig(null)).toEqual([]);
+          expect(pluginsFromTypeConfig(undefined)).toEqual([]);
         });
       });
 
       describe('and the config is a function', () => {
         it('returns an array with the function', () => {
           const fn = () => {};
-
           expect(pluginsFromTypeConfig(fn)).toEqual([fn]);
         });
       });
@@ -20,7 +21,6 @@ describe('Semantic Release Plugin Utils', () => {
       describe('and the config is a string', () => {
         it('returns an array with the result of requiring the string', () => {
           const plugin = 'myPublish';
-
           expect(pluginsFromTypeConfig(plugin)).toEqual([require(plugin)]);
         });
       });
@@ -46,25 +46,58 @@ describe('Semantic Release Plugin Utils', () => {
         const namespace = 'monorepo';
         const pluginType = 'publish';
 
-        it('calls the decorator with the corresponding plugin', async () => {
-          const pluginConfig = { [namespace]: { publish: plugin } };
+        describe('and the namespace/type combo has a plugin defined', () => {
+          it('calls the decorator with plugin', async done => {
+            const pluginConfig = { [namespace]: { publish: plugin } };
 
-          await wrapPlugin(namespace, pluginType, plugin => {
-            expect(plugin).toBe(require(plugin));
+            await wrapPlugin(namespace, pluginType, plugin => {
+              expect(plugin).toBe(require(plugin));
 
-            return typePluginConfig =>
-              expect(typePluginConfig).toEqual(pluginConfig);
-          })(pluginConfig);
+              return typePluginConfig => {
+                expect(typePluginConfig).toEqual(pluginConfig);
+                done();
+              };
+            })(pluginConfig);
+          });
+
+          it(`decorates pluginOptions with the corresponding plugin's options`, async done => {
+            const pluginConfig = {
+              [namespace]: { publish: { path: plugin, test: true } },
+            };
+
+            await wrapPlugin(namespace, pluginType, plugin => ({ test }) => {
+              expect(test).toBe(true);
+              done();
+            })(pluginConfig);
+          });
         });
 
-        it(`decorates pluginOptions with the corresponding plugin's options`, async () => {
-          const pluginConfig = {
-            [namespace]: { publish: { path: plugin, test: true } },
-          };
+        describe(`and the namespace/type combo doesn't have a plugin defined`, () => {
+          const pluginConfig = { [namespace]: {} };
 
-          await wrapPlugin(namespace, pluginType, plugin => ({ test }) => {
-            expect(test).toBe(true);
-          })(pluginConfig);
+          describe('and a default plugin was defined', () => {
+            const defaultPlugin = 'defaultPublish';
+
+            it('calls the decorator with the default plugin', async () => {
+              await wrapPlugin(
+                namespace,
+                pluginType,
+                plugin => {
+                  expect(plugin).toBe(require(defaultPlugin));
+                  return () => {};
+                },
+                defaultPlugin
+              )(pluginConfig);
+            });
+          });
+
+          describe(`and a default plugin wasn't defined`, () => {
+            it(`doesn't call the decorator`, async () => {
+              await wrapPlugin(namespace, pluginType, () => {
+                throw new Error('Decorator should not be called');
+              })(pluginConfig);
+            });
+          });
         });
       });
     });
@@ -86,23 +119,42 @@ describe('Semantic Release Plugin Utils', () => {
 
     describe('and the returned function at index X is called like a plugin', () => {
       describe('and the namespace/type combo has a plugin defined at index X', () => {
-        it('calls the decorator with plugin', async () => {
+        it('calls the decorator with plugin', async done => {
           const pluginConfig = { [namespace]: { publish: ['', plugin] } };
 
           await wrapMultiPlugin(namespace, pluginType, plugin => {
+            console.log('plugin', plugin);
             expect(plugin).toBe(require(plugin));
 
-            return typePluginConfig =>
+            return typePluginConfig => {
               expect(typePluginConfig).toEqual(pluginConfig);
+              done();
+            };
           })[1](pluginConfig);
         });
       });
 
       describe(`and the namespace/type combo doesn't have a plugin defined at index X`, () => {
+        const pluginConfig = { [namespace]: {} };
+
+        describe(`and a default plugin was defined for index X`, () => {
+          const defaultPlugin = 'defaultPublish';
+
+          it('calls the decorator with the default plugin', async done => {
+            await wrapMultiPlugin(
+              namespace,
+              pluginType,
+              plugin => {
+                expect(plugin).toBe(require(defaultPlugin));
+                done();
+              },
+              ['', defaultPlugin]
+            )[1](pluginConfig);
+          });
+        });
+
         describe(`and a default plugin wasn't defined for index X`, () => {
           it('does not invoke the decorator', async () => {
-            const pluginConfig = { [namespace]: {} };
-
             await wrapMultiPlugin(namespace, pluginType, () => {
               throw new Error('Decorator should not be called');
             })[1](pluginConfig);
