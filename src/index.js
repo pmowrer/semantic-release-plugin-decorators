@@ -28,8 +28,25 @@ const wrapPlugin = (namespace, type, fn) => {
   };
 };
 
+const wrapMultiPlugin = (namespace, type, fn) => {
+  let callCount = 0;
+
+  return Array(10).fill(async (pluginConfig, config) => {
+    const { [namespace]: { [type]: typeConfig } = {} } = pluginConfig;
+    const plugins = pluginsFromTypeConfig(typeConfig, type);
+
+    if (callCount >= plugins.length) {
+      return;
+    }
+
+    const plugin = plugins[callCount++];
+    return await fn(plugin)({ ...pluginConfig, ...typeConfig }, config);
+  });
+};
+
 module.exports = {
   pluginFromTypeConfig,
   pluginsFromTypeConfig,
   wrapPlugin,
+  wrapMultiPlugin,
 };

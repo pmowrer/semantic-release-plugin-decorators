@@ -1,4 +1,4 @@
-const { pluginsFromTypeConfig, wrapPlugin } = require('.');
+const { pluginsFromTypeConfig, wrapPlugin, wrapMultiPlugin } = require('.');
 
 describe('Semantic Release Plugin Utils', () => {
   describe('#pluginsFromTypeConfig', () => {
@@ -65,6 +65,35 @@ describe('Semantic Release Plugin Utils', () => {
           await wrapPlugin(namespace, pluginType, plugin => ({ test }) => {
             expect(test).toBe(true);
           })(pluginConfig);
+        });
+      });
+    });
+  });
+
+  describe('#wrapMultiPlugin', () => {
+    const plugin = 'myPublish';
+    const namespace = 'monorepo';
+    const pluginType = 'publish';
+
+    describe('when passed a namespace, a plugin type and a decorator function', () => {
+      it('returns an array of 10 decorated functions', () => {
+        const decorator = () => {};
+        expect(wrapMultiPlugin(namespace, pluginType, decorator)).toHaveLength(
+          10
+        );
+      });
+    });
+
+    describe('and one of the returned decorated functions is passed a pluginConfig', () => {
+      describe(`and the config contains a "[namespace].[type]" plugin definition`, () => {
+        describe('and the array index of the decorated function matches', () => {
+          it('invokes the decorator with the matching plugin definition', async () => {
+            const decorator = plugin => (pluginConfig, config) => plugin;
+            const config = { [namespace]: { publish: plugin } };
+            const decorated = wrapMultiPlugin(namespace, pluginType, decorator);
+
+            expect(await decorated[0](config)).toBe(require(plugin));
+          });
         });
       });
     });
