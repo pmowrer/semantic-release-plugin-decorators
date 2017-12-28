@@ -1,22 +1,33 @@
 const { isFunction, isPlainObject, negate } = require('lodash');
 const importFrom = require('import-from');
 
+const requirePlugin = module => importFrom(process.cwd(), module);
+
 const pluginsFromTypeConfig = config =>
   []
-    .concat((config && config.path) || config)
+    .concat((config && config.path) || config || [])
     .filter(negate(isPlainObject))
-    .filter(Boolean)
-    .map(
-      value => (isFunction(value) ? value : importFrom(process.cwd(), value))
-    );
+    .map(value => (isFunction(value) ? value : requirePlugin(value)));
 
-const pluginFromTypeConfig = (config, type, index = 0) =>
+const pluginFromTypeConfig = (config, type, index) =>
   pluginsFromTypeConfig(config, type)[index];
 
-const wrapPlugin = (namespace, type, fn) => {
+const resolvePluginFn = (config, type, _default = null, index = 0) => {
+  const plugin =
+    pluginFromTypeConfig(config, type, index) ||
+    (_default && requirePlugin(_default));
+
+  return isPlainObject(plugin) ? plugin[type] : plugin;
+};
+
+const wrapPlugin = (namespace, type, fn, _default = null, index = 0) => {
   return async (pluginConfig, config) => {
     const { [namespace]: { [type]: typeConfig } = {} } = pluginConfig;
-    const plugin = pluginFromTypeConfig(typeConfig, type);
+    const plugin = resolvePluginFn(typeConfig, type, _default, index);
+
+    if (!plugin) {
+      return;
+    }
 
     return await fn(plugin)(
       {
@@ -28,20 +39,12 @@ const wrapPlugin = (namespace, type, fn) => {
   };
 };
 
-const wrapMultiPlugin = (namespace, type, fn) => {
-  let callCount = 0;
-
-  return Array(10).fill(async (pluginConfig, config) => {
-    const { [namespace]: { [type]: typeConfig } = {} } = pluginConfig;
-    const plugins = pluginsFromTypeConfig(typeConfig, type);
-
-    if (callCount >= plugins.length) {
-      return;
-    }
-
-    const plugin = plugins[callCount++];
-    return await fn(plugin)({ ...pluginConfig, ...typeConfig }, config);
-  });
+const wrapMultiPlugin = (namespace, type, fn, _default = []) => {
+  return Array(10)
+    .fill(null)
+    .map((value, index) => {
+      return wrapPlugin(namespace, type, fn, _default[index], index);
+    });
 };
 
 module.exports = {
