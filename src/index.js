@@ -33,14 +33,19 @@ const wrapMultiPlugin = (namespace, type, fn) => {
 
   return Array(10).fill(async (pluginConfig, config) => {
     const { [namespace]: { [type]: typeConfig } = {} } = pluginConfig;
-    const plugins = pluginsFromTypeConfig(typeConfig, type);
+    const plugin = pluginFromTypeConfig(typeConfig, type, callCount++);
 
-    if (callCount >= plugins.length) {
+    if (!plugin) {
       return;
     }
 
-    const plugin = plugins[callCount++];
-    return await fn(plugin)({ ...pluginConfig, ...typeConfig }, config);
+    return await fn(plugin)(
+      {
+        ...pluginConfig,
+        ...(isPlainObject(typeConfig) ? typeConfig : undefined),
+      },
+      config
+    );
   });
 };
 
