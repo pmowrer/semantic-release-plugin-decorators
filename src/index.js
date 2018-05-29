@@ -13,9 +13,9 @@ const pluginFromTypeConfig = (config, type, index) =>
   pluginsFromTypeConfig(config, type)[index];
 
 const resolvePluginFn = (config, type, _default = null, index = 0) => {
-  const pluginConfig = pluginFromTypeConfig(config, type, index);
   const plugin =
-    config === undefined ? _default && requirePlugin(_default) : pluginConfig;
+    pluginFromTypeConfig(config, type, index) ||
+    (_default && requirePlugin(_default));
 
   return isPlainObject(plugin) ? plugin[type] : plugin;
 };
