@@ -25,7 +25,7 @@ const wrapPlugin = (namespace, type, fn, _default = null, index = 0) => {
     const { [namespace]: { [type]: typeConfig } = {} } = pluginConfig;
     const plugin = resolvePluginFn(typeConfig, type, _default, index);
 
-    if (!plugin) {
+    if (!plugin || (Array.isArray(typeConfig) && typeConfig.length <= index)) {
       return;
     }
 
