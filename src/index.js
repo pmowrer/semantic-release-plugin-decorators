@@ -13,9 +13,9 @@ const pluginFromTypeConfig = (config, type, index) =>
   pluginsFromTypeConfig(config, type)[index];
 
 const resolvePluginFn = (config, type, _default = null, index = 0) => {
-  const pluginConfig = pluginFromTypeConfig(config, type, index);
   const plugin =
-    config === undefined ? _default && requirePlugin(_default) : pluginConfig;
+    pluginFromTypeConfig(config, type, index) ||
+    (_default && requirePlugin(_default));
 
   return isPlainObject(plugin) ? plugin[type] : plugin;
 };
@@ -25,7 +25,7 @@ const wrapPlugin = (namespace, type, fn, _default = null, index = 0) => {
     const { [namespace]: { [type]: typeConfig } = {} } = pluginConfig;
     const plugin = resolvePluginFn(typeConfig, type, _default, index);
 
-    if (!plugin) {
+    if (!plugin || (Array.isArray(typeConfig) && typeConfig.length <= index)) {
       return;
     }
 
