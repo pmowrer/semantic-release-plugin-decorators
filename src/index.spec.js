@@ -73,7 +73,7 @@ describe('Semantic Release Plugin Utils', () => {
         });
 
         describe(`and the namespace/type combo doesn't have a plugin defined`, () => {
-          const pluginConfig = { [namespace]: {} };
+          const pluginConfig = { [namespace]: { publish: { test: true } } };
 
           describe('and a default plugin was defined', () => {
             const defaultPlugin = 'defaultPublish';
@@ -85,6 +85,18 @@ describe('Semantic Release Plugin Utils', () => {
                 plugin => {
                   expect(plugin).toBe(require(defaultPlugin));
                   return () => {};
+                },
+                defaultPlugin
+              )(pluginConfig);
+            });
+
+            it(`decorates pluginOptions with the corresponding plugin's options`, async done => {
+              await wrapPlugin(
+                namespace,
+                pluginType,
+                plugin => ({ test }) => {
+                  expect(test).toBe(true);
+                  done();
                 },
                 defaultPlugin
               )(pluginConfig);
