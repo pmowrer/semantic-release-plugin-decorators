@@ -139,6 +139,7 @@ describe('Semantic Release Plugin Utils', () => {
             plugin => {
               expect(plugin).toBe(require(defaultPlugin));
               done();
+              return () => {};
             },
             ['', defaultPlugin]
           )[1](pluginConfig);
@@ -201,6 +202,7 @@ describe('Semantic Release Plugin Utils', () => {
             plugin => {
               expect(plugin).toBe(require(plugin));
               done();
+              return () => {};
             },
             [defaultPlugin]
           )[0](pluginConfig);
