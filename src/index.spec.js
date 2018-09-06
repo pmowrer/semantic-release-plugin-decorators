@@ -1,27 +1,29 @@
-const { pluginsFromTypeConfig, wrapPlugin, wrapMultiPlugin } = require('.');
+const { resolvePluginsFromDefinition, wrapPlugin, wrapMultiPlugin } = require('.');
 
 describe('Semantic Release Plugin Utils', () => {
-  describe('#pluginsFromTypeConfig', () => {
+  describe('#resolvePluginsFromDefinition', () => {
     describe('when passed a release config', () => {
       describe('and the config is empty/undefined/null', () => {
         it('returns an empty array', () => {
-          expect(pluginsFromTypeConfig({})).toEqual([]);
-          expect(pluginsFromTypeConfig(null)).toEqual([]);
-          expect(pluginsFromTypeConfig(undefined)).toEqual([]);
+          expect(resolvePluginsFromDefinition({})).toEqual([]);
+          expect(resolvePluginsFromDefinition(null)).toEqual([]);
+          expect(resolvePluginsFromDefinition(undefined)).toEqual([]);
         });
       });
 
       describe('and the config is a function', () => {
         it('returns an array with the function', () => {
           const fn = () => {};
-          expect(pluginsFromTypeConfig(fn)).toEqual([fn]);
+          expect(resolvePluginsFromDefinition(fn)).toEqual([fn]);
         });
       });
 
       describe('and the config is a string', () => {
         it('returns an array with the result of requiring the string', () => {
           const plugin = 'myPlugin';
-          expect(pluginsFromTypeConfig(plugin)).toEqual([require(plugin)]);
+          expect(resolvePluginsFromDefinition(plugin)).toEqual([
+            require(plugin),
+          ]);
         });
       });
 
@@ -30,7 +32,7 @@ describe('Semantic Release Plugin Utils', () => {
           const fn = () => {};
           const plugin = 'myPlugin';
 
-          expect(pluginsFromTypeConfig([fn, plugin])).toEqual([
+          expect(resolvePluginsFromDefinition([fn, plugin])).toEqual([
             fn,
             require(plugin),
           ]);
