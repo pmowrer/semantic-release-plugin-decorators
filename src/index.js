@@ -32,7 +32,7 @@ const resolvePluginFn = (
 ) => {
   const plugin =
     resolvePluginsFromDefinition(definition)[index] ||
-    (defaultDefinition && requirePlugin(defaultDefinition));
+    resolvePluginsFromDefinition(defaultDefinition)[index];
 
   return isPlainObject(plugin) ? plugin[type] : plugin;
 };
@@ -66,7 +66,7 @@ const wrapMultiPlugin = (namespace, type, fn, defaultDefinition = []) => {
   return Array(10)
     .fill(null)
     .map((value, index) => {
-      return wrapPlugin(namespace, type, fn, defaultDefinition[index], index);
+      return wrapPlugin(namespace, type, fn, defaultDefinition, index);
     });
 };
 
