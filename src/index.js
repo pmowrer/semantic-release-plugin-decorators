@@ -21,7 +21,7 @@ const resolvePluginFn = (config, type, _default = null, index = 0) => {
 };
 
 const wrapPlugin = (namespace, type, fn, _default = null, index = 0) => {
-  return async (pluginConfig, config) => {
+  return async (pluginConfig, context) => {
     const { [namespace]: { [type]: typeConfig } = {} } = pluginConfig;
     const plugin = resolvePluginFn(typeConfig, type, _default, index);
 
@@ -34,7 +34,7 @@ const wrapPlugin = (namespace, type, fn, _default = null, index = 0) => {
         ...pluginConfig,
         ...(isPlainObject(typeConfig) ? typeConfig : undefined),
       },
-      config
+      context
     );
   };
 };
