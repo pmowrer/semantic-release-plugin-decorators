@@ -70,7 +70,43 @@ const wrapMultiPlugin = (namespace, type, fn, defaultDefinition = []) => {
     });
 };
 
+const appendMultiPlugin = (
+  namespace,
+  type,
+  appendedPlugin,
+  defaultDefinition = []
+) => {
+  return Array(10)
+    .fill(null)
+    .map((value, index) => {
+      return async (pluginConfig, context) => {
+        const { [namespace]: { [type]: definition } = {} } = pluginConfig;
+        const plugin = resolvePluginFn(
+          type,
+          definition,
+          defaultDefinition,
+          index
+        );
+
+        const definitionsLength = definition
+          ? Array.isArray(definition) && definition.length
+          : Array.isArray(defaultDefinition) && defaultDefinition.length;
+
+        if (!plugin || definitionsLength <= index) {
+          if (index > 0 && definitionsLength === index) {
+            return appendedPlugin(pluginConfig, context);
+          } else {
+            return;
+          }
+        }
+
+        return plugin(pluginConfig, context);
+      };
+    });
+};
+
 module.exports = {
+  appendMultiPlugin,
   resolvePluginsFromDefinition,
   wrapPlugin,
   wrapMultiPlugin,

@@ -1,4 +1,9 @@
-const { resolvePluginsFromDefinition, wrapPlugin, wrapMultiPlugin } = require('.');
+const {
+  appendMultiPlugin,
+  resolvePluginsFromDefinition,
+  wrapPlugin,
+  wrapMultiPlugin,
+} = require('.');
 
 describe('Semantic Release Plugin Utils', () => {
   describe('#resolvePluginsFromDefinition', () => {
@@ -218,6 +223,121 @@ describe('Semantic Release Plugin Utils', () => {
             pluginType,
             () => {
               throw new Error('Decorator should not be called');
+            },
+            [defaultPlugin, defaultPlugin]
+          )[1](pluginConfig);
+        });
+      });
+    });
+  });
+});
+
+describe('#appendMultiPlugin', () => {
+  const namespace = 'monorepo';
+  const pluginType = 'generateNotes';
+  const defaultPlugin = 'defaultPlugin';
+
+  describe('when passed a namespace, a plugin type and a plugin function to append', () => {
+    describe(`and the namespace/type combo doesn't define a plugin`, () => {
+      const pluginConfig = { [namespace]: {} };
+
+      describe(`and N default plugins were defined`, () => {
+        it('returns an array where index <= N are the default plugins', async done => {
+          await appendMultiPlugin(namespace, pluginType, () => {}, [
+            defaultPlugin,
+            () => done(),
+          ])[1](pluginConfig);
+        });
+
+        it('returns an array where the N + 1 index is the appended plugin', async done => {
+          await appendMultiPlugin(
+            namespace,
+            pluginType,
+            () => {
+              done();
+            },
+            [defaultPlugin, defaultPlugin]
+          )[2](pluginConfig);
+        });
+
+        it('returns an array where the N + 2 index is undefined', async () => {
+          await appendMultiPlugin(
+            namespace,
+            pluginType,
+            () => {
+              throw new Error('Appended plugin should not be called');
+            },
+            [defaultPlugin, defaultPlugin]
+          )[3](pluginConfig);
+        });
+      });
+    });
+
+    describe(`and the namespace/type combo defines an empty array`, () => {
+      const pluginConfig = { [namespace]: { [pluginType]: [] } };
+
+      describe(`and a default plugin was defined for index X`, () => {
+        it('returns an array with undefined indexes', async () => {
+          const appendedMultiPlugin = appendMultiPlugin(
+            namespace,
+            pluginType,
+            () => {
+              throw new Error('Appended plugin should not be called');
+            },
+            [
+              () => {
+                throw new Error('Default plugin should not be called');
+              },
+            ]
+          );
+
+          await appendedMultiPlugin[0](pluginConfig);
+          await appendedMultiPlugin[1](pluginConfig);
+        });
+      });
+
+      describe(`and default plugin(s) weren't defined`, () => {
+        it('returns an array with undefined indexes', async () => {
+          await appendMultiPlugin(
+            namespace,
+            pluginType,
+            () => {
+              throw new Error('Appended plugin should not be called');
+            },
+            []
+          )[0](pluginConfig);
+        });
+      });
+    });
+
+    describe('and the namespace/type combo has N plugin(s) defined', () => {
+      const pluginConfig = { [namespace]: { [pluginType]: [() => {}] } };
+
+      it('returns an array where index <= N are the defined plugins', async () => {
+        await appendMultiPlugin(namespace, pluginType, () => {
+          throw new Error('Appended plugin should not be called');
+        })[0](pluginConfig);
+      });
+
+      it('returns an array where the N + 1 index is the appended plugin', async done => {
+        await appendMultiPlugin(namespace, pluginType, () => {
+          done();
+        })[1](pluginConfig);
+      });
+
+      it('returns an array where the N + 2 index is undefined', async () => {
+        await appendMultiPlugin(namespace, pluginType, () => {
+          throw new Error('Appended plugin should not be called');
+        })[2](pluginConfig);
+      });
+
+      describe('and the namespace/type combo has a default plugin(s) defined', () => {
+        it('ignores them', async done => {
+          await appendMultiPlugin(
+            namespace,
+            pluginType,
+            () => {
+              done();
             },
             [defaultPlugin, defaultPlugin]
           )[1](pluginConfig);
