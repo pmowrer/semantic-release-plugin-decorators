@@ -1,7 +1,7 @@
 const { isFunction, isPlainObject, negate } = require('lodash');
 const importFrom = require('import-from');
 
-const requirePlugin = module => importFrom(process.cwd(), typeof module === 'string' ? module : module[0]);
+const requirePlugin = module => importFrom(process.cwd(), [].concat(module)[0]);
 
 /**
  * @param definition Any valid `semantic-release` plugin format (`String`,
