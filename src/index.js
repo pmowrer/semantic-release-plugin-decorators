@@ -106,6 +106,8 @@ const appendMultiPlugin = (
 };
 
 module.exports = {
+  appendStep: require('./appendStep'),
+  wrapStep: require('./wrapStep'),
   appendMultiPlugin,
   resolvePluginsFromDefinition,
   wrapPlugin,
