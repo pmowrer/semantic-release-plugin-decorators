@@ -22,7 +22,10 @@ const wrapStep = (stepName, wrapFn, defaultReturn = undefined) => {
         const {
           options: { plugins },
         } = context;
-        const pluginName = plugins[index];
+        const pluginDefinition = plugins[index];
+        const pluginName = Array.isArray(pluginDefinition)
+          ? pluginDefinition[0]
+          : pluginDefinition;
 
         if (!pluginName) {
           return defaultReturn;

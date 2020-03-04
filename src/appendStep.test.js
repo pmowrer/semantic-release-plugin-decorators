@@ -89,7 +89,12 @@ describe('#appendStep', () => {
         plugins: [
           '@semantic-release/github',
           '@semantic-release/npm',
-          '@semantic-release/commit-analyzer',
+          [
+            '@semantic-release/commit-analyzer',
+            {
+              preset: 'angular',
+            },
+          ],
         ],
       },
     };
