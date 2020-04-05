@@ -12,13 +12,20 @@
  * @param {string} stepName Name of the `semantic-release` lifecycle step (e.g. "verifyConditions").
  * @param {Function} wrapFn Function wrapping each plugin-provided step function. Accepts the stepFn
  * and returns a wrapped version.
- * @param {*} defaultReturn Value to return when no step definition is found.
+ * @param {Object} options
+ * @param {*} options.defaultReturn Value to return when no step definition is found.
+ * @param {*} options.wrapperName Name that identifies the wrapped functions in `semantic-release`'s
+ * debug output (will display as "anonymous" by default).
  */
-const wrapStep = (stepName, wrapFn, defaultReturn = undefined) => {
+const wrapStep = (
+  stepName,
+  wrapFn,
+  { defaultReturn = undefined, wrapperName = '' } = {}
+) => {
   return Array(10)
     .fill(null)
     .map((value, index) => {
-      return async (_, context) => {
+      const wrapperFn = async function(_, context) {
         const {
           options: { plugins },
         } = context;
@@ -40,6 +47,10 @@ const wrapStep = (stepName, wrapFn, defaultReturn = undefined) => {
 
         return wrapFn(step)(pluginConfig, context);
       };
+
+      Object.defineProperty(wrapperFn, 'name', { value: wrapperName });
+
+      return wrapperFn;
     });
 };
 

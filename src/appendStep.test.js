@@ -11,11 +11,9 @@ describe('#appendStep', () => {
 
   beforeEach(() => {
     appendedStepFn = jest.fn();
-    verifyConditions = appendStep(
-      'verifyConditions',
-      appendedStepFn,
-      defaultReturn
-    );
+    verifyConditions = appendStep('verifyConditions', appendedStepFn, {
+      defaultReturn,
+    });
   });
 
   afterEach(() => jest.resetModules());
