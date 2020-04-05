@@ -11,7 +11,9 @@ describe('#wrapStep', () => {
 
   beforeEach(() => {
     wrapStepFn = jest.fn();
-    verifyConditions = wrapStep('verifyConditions', wrapStepFn, defaultReturn);
+    verifyConditions = wrapStep('verifyConditions', wrapStepFn, {
+      defaultReturn,
+    });
   });
 
   afterEach(() => jest.resetModules());

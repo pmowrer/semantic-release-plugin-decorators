@@ -21,10 +21,7 @@
     "semantic-release": "^17.0.1",
     "semantic-release-github-pr": "^6.0.0"
   },
-  "dependencies": {
-    "import-from": "^2.1.0",
-    "lodash": "^4.17.15"
-  },
+  "dependencies": {},
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged"

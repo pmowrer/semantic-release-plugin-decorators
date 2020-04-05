@@ -13,15 +13,22 @@
  * @param {string} stepName Name of the `semantic-release` lifecycle step (e.g. "verifyConditions").
  * @param {Function} stepFn Function to run after all plugins with a definition for this step have run.
  * Receives the results of all plugin-provided step functions in `context.stepResults`.
- * @param {*} defaultReturn Value to return when no step definition is found.
+ * @param {Object} options
+ * @param {*} options.defaultReturn Value to return when no step definition is found.
+ * @param {string} options.wrapperName Name that identifies the wrapped functions in `semantic-release`'s
+ * debug output (will display as "anonymous" by default).
  */
-const appendStep = (stepName, stepFn, defaultReturn = undefined) => {
+const appendStep = (
+  stepName,
+  stepFn,
+  { defaultReturn = undefined, wrapperName = '' } = {}
+) => {
   const results = [];
 
   return Array(10)
     .fill(null)
     .map((value, index) => {
-      return async (pluginConfig, context) => {
+      const wrapperFn = async (pluginConfig, context) => {
         const {
           options: { plugins },
         } = context;
@@ -52,6 +59,10 @@ const appendStep = (stepName, stepFn, defaultReturn = undefined) => {
         results.push(result);
         return result;
       };
+
+      Object.defineProperty(wrapperFn, 'name', { value: wrapperName });
+
+      return wrapperFn;
     });
 };
 
