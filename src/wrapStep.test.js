@@ -23,7 +23,6 @@ describe('#wrapStep', () => {
   });
 
   describe('when there are no plugin steps defined', () => {
-    const pluginConfig = {};
     const context = {
       options: {
         plugins: [],
@@ -34,10 +33,7 @@ describe('#wrapStep', () => {
       let results;
 
       beforeEach(
-        () =>
-          (results = verifyConditions.map(stepFn =>
-            stepFn(pluginConfig, context)
-          ))
+        () => (results = verifyConditions.map(stepFn => stepFn({}, context)))
       );
 
       it("doesn't call wrappedStepFn", () => {
@@ -65,12 +61,16 @@ describe('#wrapStep', () => {
       analyzeCommits: jest.fn().mockReturnValue('analyzeCommits'),
     });
 
-    const pluginConfig = {};
     const context = {
       options: {
         plugins: [
           '@semantic-release/github',
-          '@semantic-release/npm',
+          [
+            '@semantic-release/npm',
+            {
+              npmPublish: false,
+            },
+          ],
           [
             '@semantic-release/commit-analyzer',
             {
@@ -92,7 +92,7 @@ describe('#wrapStep', () => {
 
         results = verifyConditions
           .slice(0, context.options.plugins.length)
-          .map(fn => fn(pluginConfig, context));
+          .map(fn => fn({}, context));
       });
 
       it('runs wrappedStepFn for each associated plugin with the given lifecycle step', () => {
@@ -101,11 +101,18 @@ describe('#wrapStep', () => {
           require(context.options.plugins[0]).verifyConditions
         );
         expect(wrapStepFn).toHaveBeenCalledWith(
-          require(context.options.plugins[1]).verifyConditions
+          require(context.options.plugins[1][0]).verifyConditions
         );
 
         expect(wrappedFn).toHaveBeenCalledTimes(2);
-        expect(wrappedFn).toHaveBeenCalledWith(pluginConfig, context);
+        expect(wrappedFn).toHaveBeenNthCalledWith(1, {}, context);
+        expect(wrappedFn).toHaveBeenNthCalledWith(
+          2,
+          {
+            npmPublish: false,
+          },
+          context
+        );
       });
 
       it('returns the result of the wrapped step fns', () => {
