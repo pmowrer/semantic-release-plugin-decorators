@@ -18,14 +18,14 @@ const wrapStep = (stepName, wrapFn, defaultReturn = undefined) => {
   return Array(10)
     .fill(null)
     .map((value, index) => {
-      return async (pluginConfig, context) => {
+      return async (_, context) => {
         const {
           options: { plugins },
         } = context;
         const pluginDefinition = plugins[index];
-        const pluginName = Array.isArray(pluginDefinition)
-          ? pluginDefinition[0]
-          : pluginDefinition;
+        const [pluginName, pluginConfig] = Array.isArray(pluginDefinition)
+          ? pluginDefinition
+          : [pluginDefinition, {}];
 
         if (!pluginName) {
           return defaultReturn;
