@@ -36,6 +36,14 @@ const wrapStep = (
 
         if (!pluginName) {
           return defaultReturn;
+        } else if (typeof pluginName !== 'string') {
+          throw new Error(
+            `${
+              wrapperName ? wrapperName : 'semantic-release-plugin-decorators'
+            }: Incorrect plugin name type. Expected string but was ${JSON.stringify(
+              pluginName
+            )}.`
+          );
         }
 
         const plugin = require(pluginName);
