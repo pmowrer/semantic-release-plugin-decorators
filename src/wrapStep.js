@@ -25,7 +25,7 @@ const wrapStep = (
   return Array(10)
     .fill(null)
     .map((value, index) => {
-      const wrapperFn = async function(_, context) {
+      const wrapperFn = async function(globalPluginConfig, context) {
         const {
           options: { plugins },
         } = context;
@@ -53,7 +53,7 @@ const wrapStep = (
           return defaultReturn;
         }
 
-        return wrapFn(step)(pluginConfig, context);
+        return wrapFn(step)({ ...globalPluginConfig, ...pluginConfig }, context);
       };
 
       Object.defineProperty(wrapperFn, 'name', { value: wrapperName });
