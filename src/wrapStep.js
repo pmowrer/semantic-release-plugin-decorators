@@ -25,16 +25,24 @@ const wrapStep = (
   return Array(10)
     .fill(null)
     .map((value, index) => {
-      const wrapperFn = async function(_, context) {
+      const wrapperFn = async function(globalPluginConfig, context) {
         const {
           options: { plugins },
         } = context;
+
+        if (plugins.length <= index) {
+          context.logger.log(`No more plugins`);
+          return defaultReturn;
+        }
+
         const pluginDefinition = plugins[index];
         const [pluginName, pluginConfig] = Array.isArray(pluginDefinition)
           ? pluginDefinition
           : [pluginDefinition, {}];
 
         if (!pluginName) {
+          // Still needed ?
+          context.logger.log(`Falsy plugin name at index "${index}"`);
           return defaultReturn;
         } else if (typeof pluginName !== 'string') {
           throw new Error(
@@ -50,10 +58,26 @@ const wrapStep = (
         const step = plugin && plugin[stepName];
 
         if (!step) {
+          context.logger.log(
+            `Plugin "${pluginName}" does not provide step "${stepName}"`
+          );
           return defaultReturn;
         }
 
-        return wrapFn(step)(pluginConfig, context);
+        context.logger.log(
+          `Start step "${stepName}" of plugin "${pluginName}"`
+        );
+        const stepResult = wrapFn(step)(
+          { ...globalPluginConfig, ...pluginConfig },
+          context
+        );
+        stepResult.then(() =>
+          context.logger.log(
+            `Completed step "${stepName}" of plugin "${pluginName}"`
+          )
+        );
+
+        return stepResult;
       };
 
       Object.defineProperty(wrapperFn, 'name', { value: wrapperName });
