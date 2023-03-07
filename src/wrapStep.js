@@ -54,7 +54,7 @@ const wrapStep = (
           );
         }
 
-        const plugin = require(pluginName);
+        const plugin = import(pluginName);
         const step = plugin && plugin[stepName];
 
         if (!step) {

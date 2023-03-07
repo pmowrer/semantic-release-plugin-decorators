@@ -100,10 +100,10 @@ describe('#wrapStep', () => {
       it('runs wrappedStepFn for each associated plugin with the given lifecycle step', () => {
         expect(wrapStepFn).toHaveBeenCalledTimes(2);
         expect(wrapStepFn).toHaveBeenCalledWith(
-          require(context.options.plugins[0]).verifyConditions
+          import(context.options.plugins[0]).verifyConditions
         );
         expect(wrapStepFn).toHaveBeenCalledWith(
-          require(context.options.plugins[1][0]).verifyConditions
+          import(context.options.plugins[1][0]).verifyConditions
         );
 
         expect(wrappedFn).toHaveBeenCalledTimes(2);

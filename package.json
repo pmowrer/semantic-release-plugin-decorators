@@ -1,8 +1,9 @@
 {
-  "name": "semantic-release-plugin-decorators",
-  "version": "0.0.0-development",
+  "name": "@w4rlock/semantic-release-plugin-decorators",
+  "type": "module",
+  "version": "0.0.0",
   "main": "src/index.js",
-  "repository": "git@github.com:Updater/semantic-release-plugin-decorators.git",
+  "repository": "git@github.com:w4rlock/semantic-release-plugin-decorators.git",
   "scripts": {
     "format": "prettier --write --single-quote --trailing-comma es5",
     "format:all": "yarn format \"./**/*.js\"",
