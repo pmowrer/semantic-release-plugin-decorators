@@ -17,7 +17,7 @@
  * @param {*} options.wrapperName Name that identifies the wrapped functions in `semantic-release`'s
  * debug output (will display as "anonymous" by default).
  */
-const wrapStep = (
+export const wrapStep = (
   stepName,
   wrapFn,
   { defaultReturn = undefined, wrapperName = '' } = {}
@@ -85,5 +85,3 @@ const wrapStep = (
       return wrapperFn;
     });
 };
-
-module.exports = wrapStep;
