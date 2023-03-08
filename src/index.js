@@ -1,2 +1,4 @@
-export * from './appendStep';
-export * from './wrapStep';
+import { appendStep } from './appendStep';
+import { wrapStep } from './wrapStep';
+
+export { appendStep, wrapStep };
