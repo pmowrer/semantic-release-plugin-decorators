@@ -1,4 +1,4 @@
-import { appendStep } from './appendStep';
-import { wrapStep } from './wrapStep';
+import { appendStep } from './appendStep.js';
+import { wrapStep } from './wrapStep.js';
 
 export { appendStep, wrapStep };
