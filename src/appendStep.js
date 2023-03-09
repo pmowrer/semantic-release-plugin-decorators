@@ -18,7 +18,7 @@
  * @param {string} options.wrapperName Name that identifies the wrapped functions in `semantic-release`'s
  * debug output (will display as "anonymous" by default).
  */
-export const appendStep = (
+export default (
   stepName,
   stepFn,
   { defaultReturn = undefined, wrapperName = '' } = {}
@@ -46,17 +46,17 @@ export const appendStep = (
 
         if (!pluginName) {
           return defaultReturn;
-        } else if (typeof pluginName !== 'string') {
+        }
+        if (typeof pluginName !== 'string') {
           throw new Error(
-            `${
-              wrapperName ? wrapperName : 'semantic-release-plugin-decorators'
-            }: Incorrect plugin name type. Expected string but was ${JSON.stringify(
+            `${wrapperName ||
+              'semantic-release-plugin-decorators'}: Incorrect plugin name type. Expected string but was ${JSON.stringify(
               pluginName
             )}.`
           );
         }
 
-        const plugin = import(pluginName);
+        const plugin = await import(pluginName);
         const step = plugin && plugin[stepName];
 
         if (!step) {

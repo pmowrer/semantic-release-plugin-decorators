@@ -1,1 +1,1 @@
-module.exports = (path, module) => require(module);
+export default (path, module) => import(module);

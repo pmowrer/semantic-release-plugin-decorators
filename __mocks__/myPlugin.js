@@ -1,1 +1,1 @@
-module.exports = 'myPlugin';
+export default 'myPlugin';

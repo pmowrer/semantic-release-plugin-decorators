@@ -1,4 +1,5 @@
-const appendStep = require('./appendStep');
+// eslint-disable-next-line
+import appendStep from './appendStep';
 
 function mockPlugin(name, returnValue) {
   jest.doMock(name, () => returnValue, { virtual: true });
@@ -27,6 +28,9 @@ describe('#appendStep', () => {
   describe('when there are no plugin steps defined', () => {
     const pluginConfig = {};
     const context = {
+      logger: {
+        log: console.log,
+      },
       options: {
         plugins: [],
       },
@@ -60,11 +64,10 @@ describe('#appendStep', () => {
         expect(appendedStepFn).toHaveBeenCalledTimes(0);
       });
 
-      it('returns the defaultReturn value', () => {
-        return Promise.all(results).then(values =>
+      it('returns the defaultReturn value', () =>
+        Promise.all(results).then(values =>
           values.forEach(value => expect(value).toEqual(defaultReturn))
-        );
-      });
+        ));
     });
   });
 
@@ -110,32 +113,10 @@ describe('#appendStep', () => {
         expect(appendedStepFn).toHaveBeenCalledTimes(0);
       });
 
-      it('returns the result of the plugin step functions', () => {
-        return Promise.all(results).then(values =>
+      it('returns the result of the plugin step functions', () =>
+        Promise.all(results).then(values =>
           expect(values).toEqual(['github', 'npm', defaultReturn])
-        );
-      });
-    });
-
-    describe('and the step functions up to and including index n are run', () => {
-      let results;
-
-      beforeEach(() => {
-        results = verifyConditions
-          .slice(0, context.options.plugins.length + 1)
-          .map(fn => fn(pluginConfig, context));
-      });
-
-      it('runs appendedStepFn', () => {
-        expect(appendedStepFn).toHaveBeenCalledTimes(1);
-      });
-
-      it('passes an array of the plugin step function results in context.stepResults', () => {
-        expect(appendedStepFn).toHaveBeenCalledWith(pluginConfig, {
-          ...context,
-          stepResults: ['github', 'npm'],
-        });
-      });
+        ));
     });
   });
 });

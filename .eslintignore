@@ -1,0 +1,7 @@
+/tests/**/*.js
+!/**/.eslintrc.js
+/scripts/release/node_modules
+/coverage/
+/dist/
+**/node_modules/**
+node_modules/*

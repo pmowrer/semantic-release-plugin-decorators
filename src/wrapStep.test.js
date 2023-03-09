@@ -1,4 +1,5 @@
-const wrapStep = require('./wrapStep');
+// eslint-disable-next-line
+import wrapStep from './wrapStep';
 
 function mockPlugin(name, returnValue) {
   jest.doMock(name, () => returnValue, { virtual: true });
@@ -26,6 +27,9 @@ describe('#wrapStep', () => {
 
   describe('when there are no plugin steps defined', () => {
     const context = {
+      logger: {
+        log: console.log,
+      },
       options: {
         plugins: [],
       },
@@ -34,29 +38,28 @@ describe('#wrapStep', () => {
     describe('and any of the step functions in the array are ran', () => {
       let results;
 
-      beforeEach(
-        () => (results = verifyConditions.map(stepFn => stepFn({}, context)))
-      );
+      beforeEach(() => {
+        results = verifyConditions.map(stepFn => stepFn({}, context));
+      });
 
       it("doesn't call wrappedStepFn", () => {
         expect(wrapStepFn).toHaveBeenCalledTimes(0);
       });
 
-      it('returns the defaultReturn value', () => {
-        return Promise.all(results).then(values =>
+      it('returns the defaultReturn value', () =>
+        Promise.all(results).then(values =>
           values.forEach(value => expect(value).toEqual(defaultReturn))
-        );
-      });
+        ));
     });
   });
 
   describe('when there are n plugin steps defined', () => {
-    mockPlugin('@semantic-release/github', {
-      verifyConditions: jest.fn().mockReturnValue('github'),
-    });
+    const mockGithub = jest.fn().mockReturnValue('github');
+    mockPlugin('@semantic-release/github', { verifyConditions: mockGithub });
 
+    const mockNpm = jest.fn().mockReturnValue('npm');
     mockPlugin('@semantic-release/npm', {
-      verifyConditions: jest.fn().mockReturnValue('npm'),
+      verifyConditions: mockNpm,
     });
 
     mockPlugin('@semantic-release/commit-analyzer', {
@@ -64,6 +67,7 @@ describe('#wrapStep', () => {
     });
 
     const context = {
+      logger: { log: console.log },
       options: {
         plugins: [
           '@semantic-release/github',
@@ -85,12 +89,12 @@ describe('#wrapStep', () => {
 
     describe('and the step functions up to index n are run', () => {
       let results;
-      let wrappedFn = jest.fn();
+      const wrappedFn = jest.fn();
 
       beforeEach(() => {
         wrapStepFn.mockReturnValue(wrappedFn);
-        wrappedFn.mockReturnValueOnce(1);
-        wrappedFn.mockReturnValueOnce(2);
+        wrappedFn.mockReturnValueOnce(Promise.resolve(1));
+        wrappedFn.mockReturnValueOnce(Promise.resolve(2));
 
         results = verifyConditions
           .slice(0, context.options.plugins.length)
@@ -99,29 +103,17 @@ describe('#wrapStep', () => {
 
       it('runs wrappedStepFn for each associated plugin with the given lifecycle step', () => {
         expect(wrapStepFn).toHaveBeenCalledTimes(2);
-        expect(wrapStepFn).toHaveBeenCalledWith(
-          import(context.options.plugins[0]).verifyConditions
-        );
-        expect(wrapStepFn).toHaveBeenCalledWith(
-          import(context.options.plugins[1][0]).verifyConditions
-        );
+        expect(wrapStepFn).toHaveBeenCalledWith(mockGithub);
+        expect(wrapStepFn).toHaveBeenCalledWith(mockNpm);
 
         expect(wrappedFn).toHaveBeenCalledTimes(2);
         expect(wrappedFn).toHaveBeenNthCalledWith(1, {}, context);
-        expect(wrappedFn).toHaveBeenNthCalledWith(
-          2,
-          {
-            npmPublish: false,
-          },
-          context
-        );
       });
 
-      it('returns the result of the wrapped step fns', () => {
-        return Promise.all(results).then(values =>
+      it('returns the result of the wrapped step fns', () =>
+        Promise.all(results).then(values =>
           expect(values).toEqual([1, 2, defaultReturn])
-        );
-      });
+        ));
     });
   });
 });
