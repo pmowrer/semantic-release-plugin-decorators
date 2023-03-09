@@ -18,11 +18,7 @@
  * @param {string} options.wrapperName Name that identifies the wrapped functions in `semantic-release`'s
  * debug output (will display as "anonymous" by default).
  */
-export default (
-  stepName,
-  stepFn,
-  { defaultReturn = undefined, wrapperName = '' } = {}
-) => {
+export default (stepName, stepFn, { defaultReturn = undefined, wrapperName = '' } = {}) => {
   const results = [];
 
   return Array(10)
@@ -30,17 +26,15 @@ export default (
     .map((value, index) => {
       const wrapperFn = async (pluginConfig, context) => {
         const {
-          options: { plugins },
+          options: { plugins }
         } = context;
         const pluginDefinition = plugins[index];
-        const pluginName = Array.isArray(pluginDefinition)
-          ? pluginDefinition[0]
-          : pluginDefinition;
+        const pluginName = Array.isArray(pluginDefinition) ? pluginDefinition[0] : pluginDefinition;
 
         if (index === plugins.length) {
           return stepFn(pluginConfig, {
             ...context,
-            stepResults: await Promise.all(results),
+            stepResults: await Promise.all(results)
           });
         }
 

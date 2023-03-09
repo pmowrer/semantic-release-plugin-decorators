@@ -13,7 +13,7 @@ describe('#appendStep', () => {
   beforeEach(() => {
     appendedStepFn = jest.fn();
     verifyConditions = appendStep('verifyConditions', appendedStepFn, {
-      defaultReturn,
+      defaultReturn
     });
   });
 
@@ -29,11 +29,11 @@ describe('#appendStep', () => {
     const pluginConfig = {};
     const context = {
       logger: {
-        log: console.log,
+        log: console.log
       },
       options: {
-        plugins: [],
-      },
+        plugins: []
+      }
     };
 
     describe('and the step function at index 0 is run', () => {
@@ -46,7 +46,7 @@ describe('#appendStep', () => {
       it('passes an empty array in context.stepResults', () => {
         expect(appendedStepFn).toHaveBeenCalledWith(pluginConfig, {
           ...context,
-          stepResults: [],
+          stepResults: []
         });
       });
     });
@@ -55,9 +55,7 @@ describe('#appendStep', () => {
       let results;
 
       beforeEach(() => {
-        results = verifyConditions
-          .slice(1)
-          .map(fn => fn(pluginConfig, context));
+        results = verifyConditions.slice(1).map(fn => fn(pluginConfig, context));
       });
 
       it("doesn't run appendedStepFn", () => {
@@ -65,23 +63,21 @@ describe('#appendStep', () => {
       });
 
       it('returns the defaultReturn value', () =>
-        Promise.all(results).then(values =>
-          values.forEach(value => expect(value).toEqual(defaultReturn))
-        ));
+        Promise.all(results).then(values => values.forEach(value => expect(value).toEqual(defaultReturn))));
     });
   });
 
   describe('when there are n plugin steps defined', () => {
     mockPlugin('@semantic-release/github', {
-      verifyConditions: jest.fn().mockReturnValue('github'),
+      verifyConditions: jest.fn().mockReturnValue('github')
     });
 
     mockPlugin('@semantic-release/npm', {
-      verifyConditions: jest.fn().mockReturnValue('npm'),
+      verifyConditions: jest.fn().mockReturnValue('npm')
     });
 
     mockPlugin('@semantic-release/commit-analyzer', {
-      analyzeCommits: jest.fn().mockReturnValue('analyzeCommits'),
+      analyzeCommits: jest.fn().mockReturnValue('analyzeCommits')
     });
 
     const pluginConfig = {};
@@ -93,20 +89,18 @@ describe('#appendStep', () => {
           [
             '@semantic-release/commit-analyzer',
             {
-              preset: 'angular',
-            },
-          ],
-        ],
-      },
+              preset: 'angular'
+            }
+          ]
+        ]
+      }
     };
 
     describe('and the step functions up to index n are run', () => {
       let results;
 
       beforeEach(() => {
-        results = verifyConditions
-          .slice(0, context.options.plugins.length)
-          .map(fn => fn(pluginConfig, context));
+        results = verifyConditions.slice(0, context.options.plugins.length).map(fn => fn(pluginConfig, context));
       });
 
       it("doesn't run appendedStepFn", () => {
@@ -114,9 +108,7 @@ describe('#appendStep', () => {
       });
 
       it('returns the result of the plugin step functions', () =>
-        Promise.all(results).then(values =>
-          expect(values).toEqual(['github', 'npm', defaultReturn])
-        ));
+        Promise.all(results).then(values => expect(values).toEqual(['github', 'npm', defaultReturn])));
     });
   });
 });

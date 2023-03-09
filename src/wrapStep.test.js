@@ -13,7 +13,7 @@ describe('#wrapStep', () => {
   beforeEach(() => {
     wrapStepFn = jest.fn();
     verifyConditions = wrapStep('verifyConditions', wrapStepFn, {
-      defaultReturn,
+      defaultReturn
     });
   });
 
@@ -28,11 +28,11 @@ describe('#wrapStep', () => {
   describe('when there are no plugin steps defined', () => {
     const context = {
       logger: {
-        log: console.log,
+        log: console.log
       },
       options: {
-        plugins: [],
-      },
+        plugins: []
+      }
     };
 
     describe('and any of the step functions in the array are ran', () => {
@@ -47,9 +47,7 @@ describe('#wrapStep', () => {
       });
 
       it('returns the defaultReturn value', () =>
-        Promise.all(results).then(values =>
-          values.forEach(value => expect(value).toEqual(defaultReturn))
-        ));
+        Promise.all(results).then(values => values.forEach(value => expect(value).toEqual(defaultReturn))));
     });
   });
 
@@ -59,11 +57,11 @@ describe('#wrapStep', () => {
 
     const mockNpm = jest.fn().mockReturnValue('npm');
     mockPlugin('@semantic-release/npm', {
-      verifyConditions: mockNpm,
+      verifyConditions: mockNpm
     });
 
     mockPlugin('@semantic-release/commit-analyzer', {
-      analyzeCommits: jest.fn().mockReturnValue('analyzeCommits'),
+      analyzeCommits: jest.fn().mockReturnValue('analyzeCommits')
     });
 
     const context = {
@@ -74,17 +72,17 @@ describe('#wrapStep', () => {
           [
             '@semantic-release/npm',
             {
-              npmPublish: false,
-            },
+              npmPublish: false
+            }
           ],
           [
             '@semantic-release/commit-analyzer',
             {
-              preset: 'angular',
-            },
-          ],
-        ],
-      },
+              preset: 'angular'
+            }
+          ]
+        ]
+      }
     };
 
     describe('and the step functions up to index n are run', () => {
@@ -96,9 +94,7 @@ describe('#wrapStep', () => {
         wrappedFn.mockReturnValueOnce(Promise.resolve(1));
         wrappedFn.mockReturnValueOnce(Promise.resolve(2));
 
-        results = verifyConditions
-          .slice(0, context.options.plugins.length)
-          .map(fn => fn({}, context));
+        results = verifyConditions.slice(0, context.options.plugins.length).map(fn => fn({}, context));
       });
 
       it('runs wrappedStepFn for each associated plugin with the given lifecycle step', () => {
@@ -111,9 +107,7 @@ describe('#wrapStep', () => {
       });
 
       it('returns the result of the wrapped step fns', () =>
-        Promise.all(results).then(values =>
-          expect(values).toEqual([1, 2, defaultReturn])
-        ));
+        Promise.all(results).then(values => expect(values).toEqual([1, 2, defaultReturn])));
     });
   });
 });

@@ -10,8 +10,9 @@
   "scripts": {
     "lint": "eslint --ignore-path .eslintignore --ext .js,.ts .",
     "lint:fix": "npm run lint -- --fix",
-    "format": "prettier --write --single-quote --trailing-comma es5",
-    "format:all": "yarn format \"./**/*.js\"",
+    "prettier": "prettier \"**/*.{ts,js,jsx,css,json}\"",
+    "prettier:fix": "prettier \"**/*.{ts,js,jsx,css,json}\" --write",
+    "format": "npm run prettier -- --write",
     "precommit": "lint-staged",
     "test": "jest"
   },

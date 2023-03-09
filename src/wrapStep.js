@@ -17,17 +17,13 @@
  * @param {*} options.wrapperName Name that identifies the wrapped functions in `semantic-release`'s
  * debug output (will display as "anonymous" by default).
  */
-export default (
-  stepName,
-  wrapFn,
-  { defaultReturn = undefined, wrapperName = '' } = {}
-) =>
+export default (stepName, wrapFn, { defaultReturn = undefined, wrapperName = '' } = {}) =>
   Array(10)
     .fill(null)
     .map((value, index) => {
       const wrapperFn = async function(globalPluginConfig, context) {
         const {
-          options: { plugins },
+          options: { plugins }
         } = context;
 
         if (plugins.length <= index) {
@@ -36,9 +32,7 @@ export default (
         }
 
         const pluginDefinition = plugins[index];
-        const [pluginName, pluginConfig] = Array.isArray(pluginDefinition)
-          ? pluginDefinition
-          : [pluginDefinition, {}];
+        const [pluginName, pluginConfig] = Array.isArray(pluginDefinition) ? pluginDefinition : [pluginDefinition, {}];
 
         if (!pluginName) {
           // Still needed ?
@@ -58,24 +52,13 @@ export default (
         const step = plugin && plugin[stepName];
 
         if (!step) {
-          context.logger.log(
-            `Plugin "${pluginName}" does not provide step "${stepName}"`
-          );
+          context.logger.log(`Plugin "${pluginName}" does not provide step "${stepName}"`);
           return defaultReturn;
         }
 
-        context.logger.log(
-          `Start step "${stepName}" of plugin "${pluginName}"`
-        );
-        const stepResult = wrapFn(step)(
-          { ...globalPluginConfig, ...pluginConfig },
-          context
-        );
-        stepResult.then(() =>
-          context.logger.log(
-            `Completed step "${stepName}" of plugin "${pluginName}"`
-          )
-        );
+        context.logger.log(`Start step "${stepName}" of plugin "${pluginName}"`);
+        const stepResult = wrapFn(step)({ ...globalPluginConfig, ...pluginConfig }, context);
+        stepResult.then(() => context.logger.log(`Completed step "${stepName}" of plugin "${pluginName}"`));
 
         return stepResult;
       };
