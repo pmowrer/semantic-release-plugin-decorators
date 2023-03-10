@@ -20,3 +20,4 @@ module.exports = {
     'no-spaced-func': 0
   }
 };
+
