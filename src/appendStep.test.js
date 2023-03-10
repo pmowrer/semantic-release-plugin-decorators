@@ -55,7 +55,7 @@ describe('#appendStep', () => {
       let results;
 
       beforeEach(() => {
-        results = verifyConditions.slice(1).map(fn => fn(pluginConfig, context));
+        results = verifyConditions.slice(1).map((fn) => fn(pluginConfig, context));
       });
 
       it("doesn't run appendedStepFn", () => {
@@ -63,7 +63,7 @@ describe('#appendStep', () => {
       });
 
       it('returns the defaultReturn value', () =>
-        Promise.all(results).then(values => values.forEach(value => expect(value).toEqual(defaultReturn))));
+        Promise.all(results).then((values) => values.forEach((value) => expect(value).toEqual(defaultReturn))));
     });
   });
 
@@ -100,7 +100,7 @@ describe('#appendStep', () => {
       let results;
 
       beforeEach(() => {
-        results = verifyConditions.slice(0, context.options.plugins.length).map(fn => fn(pluginConfig, context));
+        results = verifyConditions.slice(0, context.options.plugins.length).map((fn) => fn(pluginConfig, context));
       });
 
       it("doesn't run appendedStepFn", () => {
@@ -108,7 +108,7 @@ describe('#appendStep', () => {
       });
 
       it('returns the result of the plugin step functions', () =>
-        Promise.all(results).then(values => expect(values).toEqual(['github', 'npm', defaultReturn])));
+        Promise.all(results).then((values) => expect(values).toEqual(['github', 'npm', defaultReturn])));
     });
   });
 });

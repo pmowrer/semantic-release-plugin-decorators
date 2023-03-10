@@ -8,7 +8,7 @@ module.exports = {
     ecmaVersion: 12,
     sourceType: 'module',
   },
-  extends: ['eslint:recommended', 'airbnb-base' ],
+  extends: ['eslint:recommended', 'airbnb-base'],
   rules: {
     'import/extensions': [0, 'ignorePackages', { js: 'never', jsx: 'never' }],
     'max-len': 0,

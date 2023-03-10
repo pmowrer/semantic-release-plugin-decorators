@@ -8,10 +8,10 @@
     "access": "public"
   },
   "scripts": {
-    "lint": "eslint --ignore-path .eslintignore --ext .js,.ts .",
+    "lint": "eslint --ignore-path .eslintignore --ext .js,.ts,.cjs .",
     "lint:fix": "npm run lint -- --fix",
     "prettier": "prettier \"**/*.{ts,js,jsx,css,json}\"",
-    "prettier:fix": "prettier \"**/*.{ts,js,jsx,css,json}\" --write",
+    "prettier:fix": "prettier \"**/*.{ts,js,jsx,css,json,cjs}\" --write",
     "format": "npm run prettier -- --write",
     "precommit": "lint-staged",
     "test": "jest"
@@ -30,7 +30,7 @@
     "husky": "^4.2.1",
     "jest": "^25.5.4",
     "lint-staged": "^10.0.4",
-    "prettier": "^1.19.1",
+    "prettier": "^2.8.4",
     "semantic-release": "^17.0.1",
     "semantic-release-github-pr": "^6.0.0"
   },

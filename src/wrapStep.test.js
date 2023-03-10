@@ -28,7 +28,7 @@ describe('#wrapStep', () => {
   describe('when there are no plugin steps defined', () => {
     const context = {
       logger: {
-        log: console.log
+        log: () => undefined
       },
       options: {
         plugins: []
@@ -39,7 +39,7 @@ describe('#wrapStep', () => {
       let results;
 
       beforeEach(() => {
-        results = verifyConditions.map(stepFn => stepFn({}, context));
+        results = verifyConditions.map((stepFn) => stepFn({}, context));
       });
 
       it("doesn't call wrappedStepFn", () => {
@@ -47,7 +47,7 @@ describe('#wrapStep', () => {
       });
 
       it('returns the defaultReturn value', () =>
-        Promise.all(results).then(values => values.forEach(value => expect(value).toEqual(defaultReturn))));
+        Promise.all(results).then((values) => values.forEach((value) => expect(value).toEqual(defaultReturn))));
     });
   });
 
@@ -65,7 +65,7 @@ describe('#wrapStep', () => {
     });
 
     const context = {
-      logger: { log: console.log },
+      logger: { log: () => undefined },
       options: {
         plugins: [
           '@semantic-release/github',
@@ -94,7 +94,7 @@ describe('#wrapStep', () => {
         wrappedFn.mockReturnValueOnce(Promise.resolve(1));
         wrappedFn.mockReturnValueOnce(Promise.resolve(2));
 
-        results = verifyConditions.slice(0, context.options.plugins.length).map(fn => fn({}, context));
+        results = verifyConditions.slice(0, context.options.plugins.length).map((fn) => fn({}, context));
       });
 
       it('runs wrappedStepFn for each associated plugin with the given lifecycle step', () => {
@@ -107,7 +107,7 @@ describe('#wrapStep', () => {
       });
 
       it('returns the result of the wrapped step fns', () =>
-        Promise.all(results).then(values => expect(values).toEqual([1, 2, defaultReturn])));
+        Promise.all(results).then((values) => expect(values).toEqual([1, 2, defaultReturn])));
     });
   });
 });

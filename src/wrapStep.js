@@ -20,8 +20,8 @@
 export default (stepName, wrapFn, { defaultReturn = undefined, wrapperName = '' } = {}) =>
   Array(10)
     .fill(null)
-    .map((value, index) => {
-      const wrapperFn = async function(globalPluginConfig, context) {
+    .map((_value, index) => {
+      const wrapperFn = async (globalPluginConfig, context) => {
         const {
           options: { plugins }
         } = context;
@@ -41,10 +41,9 @@ export default (stepName, wrapFn, { defaultReturn = undefined, wrapperName = '' 
         }
         if (typeof pluginName !== 'string') {
           throw new Error(
-            `${wrapperName ||
-              'semantic-release-plugin-decorators'}: Incorrect plugin name type. Expected string but was ${JSON.stringify(
-              pluginName
-            )}.`
+            `${
+              wrapperName || 'semantic-release-plugin-decorators'
+            }: Incorrect plugin name type. Expected string but was ${JSON.stringify(pluginName)}.`
           );
         }
 

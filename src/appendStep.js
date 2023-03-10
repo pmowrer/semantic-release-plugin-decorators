@@ -43,10 +43,9 @@ export default (stepName, stepFn, { defaultReturn = undefined, wrapperName = '' 
         }
         if (typeof pluginName !== 'string') {
           throw new Error(
-            `${wrapperName ||
-              'semantic-release-plugin-decorators'}: Incorrect plugin name type. Expected string but was ${JSON.stringify(
-              pluginName
-            )}.`
+            `${
+              wrapperName || 'semantic-release-plugin-decorators'
+            }: Incorrect plugin name type. Expected string but was ${JSON.stringify(pluginName)}.`
           );
         }
 
