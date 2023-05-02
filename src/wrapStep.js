@@ -1,3 +1,4 @@
+const loadPlugin = require('./utils');
 /**
  * Wrap each `semantic-release` lifecycle step function to inject custom logic into
  * `semantic-release`'s plugin system, augmenting its functionality without making
@@ -54,7 +55,7 @@ const wrapStep = (
           );
         }
 
-        const plugin = require(pluginName);
+        const plugin = await loadPlugin(pluginName);
         const step = plugin && plugin[stepName];
 
         if (!step) {

@@ -1,3 +1,4 @@
+const loadPlugin = require('./utils');
 /**
  * Run a `semantic-release` lifecycle step function after all plugin-provided
  * step functions have run. This utility allows injecting into the `semantic-release`
@@ -56,7 +57,7 @@ const appendStep = (
           );
         }
 
-        const plugin = require(pluginName);
+        const plugin = await loadPlugin(pluginName);
         const step = plugin && plugin[stepName];
 
         if (!step) {
