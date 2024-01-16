@@ -29,6 +29,9 @@ describe('#wrapStep', () => {
       options: {
         plugins: [],
       },
+      logger: {
+        log: jest.fn(),
+      },
     };
 
     describe('and any of the step functions in the array are ran', () => {
@@ -81,6 +84,9 @@ describe('#wrapStep', () => {
           ],
         ],
       },
+      logger: {
+        log: jest.fn(),
+      },
     };
 
     describe('and the step functions up to index n are run', () => {
@@ -89,8 +95,8 @@ describe('#wrapStep', () => {
 
       beforeEach(() => {
         wrapStepFn.mockReturnValue(wrappedFn);
-        wrappedFn.mockReturnValueOnce(1);
-        wrappedFn.mockReturnValueOnce(2);
+        wrappedFn.mockReturnValueOnce(Promise.resolve(1));
+        wrappedFn.mockReturnValueOnce(Promise.resolve(2));
 
         results = verifyConditions
           .slice(0, context.options.plugins.length)

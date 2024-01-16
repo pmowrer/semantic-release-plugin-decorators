@@ -2,7 +2,7 @@
   "name": "semantic-release-plugin-decorators",
   "version": "0.0.0-development",
   "main": "src/index.js",
-  "repository": "git@github.com:Updater/semantic-release-plugin-decorators.git",
+  "repository": "git@github.com:pmowrer/semantic-release-plugin-decorators.git",
   "scripts": {
     "format": "prettier --write --single-quote --trailing-comma es5",
     "format:all": "yarn format \"./**/*.js\"",
