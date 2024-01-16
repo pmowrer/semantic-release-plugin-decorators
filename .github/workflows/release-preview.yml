@@ -1,0 +1,13 @@
+name: Release preview
+on: [pull_request]
+jobs:
+  release-preview:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20
+      - run: yarn run semantic-release-github-pr --debug
