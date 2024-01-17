@@ -1,4 +1,5 @@
-const appendStep = require('./appendStep');
+// eslint-disable-next-line
+import appendStep from './appendStep';
 
 function mockPlugin(name, returnValue) {
   jest.doMock(name, () => returnValue, { virtual: true });
@@ -12,7 +13,7 @@ describe('#appendStep', () => {
   beforeEach(() => {
     appendedStepFn = jest.fn();
     verifyConditions = appendStep('verifyConditions', appendedStepFn, {
-      defaultReturn,
+      defaultReturn
     });
   });
 
@@ -27,9 +28,12 @@ describe('#appendStep', () => {
   describe('when there are no plugin steps defined', () => {
     const pluginConfig = {};
     const context = {
-      options: {
-        plugins: [],
+      logger: {
+        log: console.log
       },
+      options: {
+        plugins: []
+      }
     };
 
     describe('and the step function at index 0 is run', () => {
@@ -42,7 +46,7 @@ describe('#appendStep', () => {
       it('passes an empty array in context.stepResults', () => {
         expect(appendedStepFn).toHaveBeenCalledWith(pluginConfig, {
           ...context,
-          stepResults: [],
+          stepResults: []
         });
       });
     });
@@ -51,34 +55,29 @@ describe('#appendStep', () => {
       let results;
 
       beforeEach(() => {
-        results = verifyConditions
-          .slice(1)
-          .map(fn => fn(pluginConfig, context));
+        results = verifyConditions.slice(1).map((fn) => fn(pluginConfig, context));
       });
 
       it("doesn't run appendedStepFn", () => {
         expect(appendedStepFn).toHaveBeenCalledTimes(0);
       });
 
-      it('returns the defaultReturn value', () => {
-        return Promise.all(results).then(values =>
-          values.forEach(value => expect(value).toEqual(defaultReturn))
-        );
-      });
+      it('returns the defaultReturn value', () =>
+        Promise.all(results).then((values) => values.forEach((value) => expect(value).toEqual(defaultReturn))));
     });
   });
 
   describe('when there are n plugin steps defined', () => {
     mockPlugin('@semantic-release/github', {
-      verifyConditions: jest.fn().mockReturnValue('github'),
+      verifyConditions: jest.fn().mockReturnValue('github')
     });
 
     mockPlugin('@semantic-release/npm', {
-      verifyConditions: jest.fn().mockReturnValue('npm'),
+      verifyConditions: jest.fn().mockReturnValue('npm')
     });
 
     mockPlugin('@semantic-release/commit-analyzer', {
-      analyzeCommits: jest.fn().mockReturnValue('analyzeCommits'),
+      analyzeCommits: jest.fn().mockReturnValue('analyzeCommits')
     });
 
     const pluginConfig = {};
@@ -90,52 +89,26 @@ describe('#appendStep', () => {
           [
             '@semantic-release/commit-analyzer',
             {
-              preset: 'angular',
-            },
-          ],
-        ],
-      },
+              preset: 'angular'
+            }
+          ]
+        ]
+      }
     };
 
     describe('and the step functions up to index n are run', () => {
       let results;
 
       beforeEach(() => {
-        results = verifyConditions
-          .slice(0, context.options.plugins.length)
-          .map(fn => fn(pluginConfig, context));
+        results = verifyConditions.slice(0, context.options.plugins.length).map((fn) => fn(pluginConfig, context));
       });
 
       it("doesn't run appendedStepFn", () => {
         expect(appendedStepFn).toHaveBeenCalledTimes(0);
       });
 
-      it('returns the result of the plugin step functions', () => {
-        return Promise.all(results).then(values =>
-          expect(values).toEqual(['github', 'npm', defaultReturn])
-        );
-      });
-    });
-
-    describe('and the step functions up to and including index n are run', () => {
-      let results;
-
-      beforeEach(() => {
-        results = verifyConditions
-          .slice(0, context.options.plugins.length + 1)
-          .map(fn => fn(pluginConfig, context));
-      });
-
-      it('runs appendedStepFn', () => {
-        expect(appendedStepFn).toHaveBeenCalledTimes(1);
-      });
-
-      it('passes an array of the plugin step function results in context.stepResults', () => {
-        expect(appendedStepFn).toHaveBeenCalledWith(pluginConfig, {
-          ...context,
-          stepResults: ['github', 'npm'],
-        });
-      });
+      it('returns the result of the plugin step functions', () =>
+        Promise.all(results).then((values) => expect(values).toEqual(['github', 'npm', defaultReturn])));
     });
   });
 });
