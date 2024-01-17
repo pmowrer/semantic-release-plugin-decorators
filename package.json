@@ -11,15 +11,13 @@
   },
   "license": "MIT",
   "peerDependencies": {
-    "semantic-release": ">=11"
+    "semantic-release": ">=11 < 20"
   },
   "devDependencies": {
     "husky": "^4.2.1",
     "jest": "^25.1.0",
     "lint-staged": "^10.0.4",
-    "prettier": "^1.19.1",
-    "semantic-release": "^17.0.1",
-    "semantic-release-github-pr": "^6.0.0"
+    "prettier": "^1.19.1"
   },
   "dependencies": {},
   "husky": {
