@@ -1,25 +1,39 @@
 {
   "name": "semantic-release-plugin-decorators",
   "version": "0.0.0-development",
+  "type": "module",
   "main": "src/index.js",
-  "repository": "git@github.com:pmowrer/semantic-release-plugin-decorators.git",
+  "repository": "git@github.com:Updater/semantic-release-plugin-decorators.git",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
-    "format": "prettier --write --single-quote --trailing-comma es5",
-    "format:all": "yarn format \"./**/*.js\"",
+    "lint": "eslint --ignore-path .eslintignore --ext .js,.ts,.cjs .",
+    "lint:fix": "npm run lint -- --fix",
+    "prettier": "prettier \"**/*.{ts,js,jsx,css,json}\"",
+    "prettier:fix": "prettier \"**/*.{ts,js,jsx,css,json,cjs}\" --write",
+    "format": "npm run prettier -- --write",
     "precommit": "lint-staged",
     "test": "jest"
   },
   "license": "MIT",
   "peerDependencies": {
-    "semantic-release": ">=11 < 20"
+    "semantic-release": ">20"
   },
   "devDependencies": {
+    "@babel/core": "^7.21.0",
+    "@babel/preset-env": "^7.20.2",
+    "babel-jest": "^29.5.0",
+    "eslint": "^8.35.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^8.7.0",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-prettier": "^4.2.1",
     "husky": "^4.2.1",
-    "jest": "^25.1.0",
+    "jest": "^25.5.4",
     "lint-staged": "^10.0.4",
-    "prettier": "^1.19.1"
+    "prettier": "^2.8.4"
   },
-  "dependencies": {},
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged"

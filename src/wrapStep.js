@@ -17,65 +17,47 @@
  * @param {*} options.wrapperName Name that identifies the wrapped functions in `semantic-release`'s
  * debug output (will display as "anonymous" by default).
  */
-const wrapStep = (
-  stepName,
-  wrapFn,
-  { defaultReturn = undefined, wrapperName = '' } = {}
-) => {
-  return Array(10)
+export default (stepName, wrapFn, { defaultReturn = undefined, wrapperName = '' } = {}) =>
+  Array(10)
     .fill(null)
-    .map((value, index) => {
-      const wrapperFn = async function(globalPluginConfig, context) {
+    .map((_value, index) => {
+      const wrapperFn = async (globalPluginConfig, context) => {
         const {
-          options: { plugins },
+          options: { plugins }
         } = context;
 
         if (plugins.length <= index) {
-          context.logger.log(`No more plugins`);
+          context.logger.log('No more plugins');
           return defaultReturn;
         }
 
         const pluginDefinition = plugins[index];
-        const [pluginName, pluginConfig] = Array.isArray(pluginDefinition)
-          ? pluginDefinition
-          : [pluginDefinition, {}];
+        const [pluginName, pluginConfig] = Array.isArray(pluginDefinition) ? pluginDefinition : [pluginDefinition, {}];
 
         if (!pluginName) {
           // Still needed ?
           context.logger.log(`Falsy plugin name at index "${index}"`);
           return defaultReturn;
-        } else if (typeof pluginName !== 'string') {
+        }
+        if (typeof pluginName !== 'string') {
           throw new Error(
             `${
-              wrapperName ? wrapperName : 'semantic-release-plugin-decorators'
-            }: Incorrect plugin name type. Expected string but was ${JSON.stringify(
-              pluginName
-            )}.`
+              wrapperName || 'semantic-release-plugin-decorators'
+            }: Incorrect plugin name type. Expected string but was ${JSON.stringify(pluginName)}.`
           );
         }
 
-        const plugin = require(pluginName);
+        const plugin = await import(pluginName);
         const step = plugin && plugin[stepName];
 
         if (!step) {
-          context.logger.log(
-            `Plugin "${pluginName}" does not provide step "${stepName}"`
-          );
+          context.logger.log(`Plugin "${pluginName}" does not provide step "${stepName}"`);
           return defaultReturn;
         }
 
-        context.logger.log(
-          `Start step "${stepName}" of plugin "${pluginName}"`
-        );
-        const stepResult = wrapFn(step)(
-          { ...globalPluginConfig, ...pluginConfig },
-          context
-        );
-        stepResult.then(() =>
-          context.logger.log(
-            `Completed step "${stepName}" of plugin "${pluginName}"`
-          )
-        );
+        context.logger.log(`Start step "${stepName}" of plugin "${pluginName}"`);
+        const stepResult = wrapFn(step)({ ...globalPluginConfig, ...pluginConfig }, context);
+        stepResult.then(() => context.logger.log(`Completed step "${stepName}" of plugin "${pluginName}"`));
 
         return stepResult;
       };
@@ -84,6 +66,3 @@ const wrapStep = (
 
       return wrapperFn;
     });
-};
-
-module.exports = wrapStep;

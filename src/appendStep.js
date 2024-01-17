@@ -18,11 +18,7 @@
  * @param {string} options.wrapperName Name that identifies the wrapped functions in `semantic-release`'s
  * debug output (will display as "anonymous" by default).
  */
-const appendStep = (
-  stepName,
-  stepFn,
-  { defaultReturn = undefined, wrapperName = '' } = {}
-) => {
+export default (stepName, stepFn, { defaultReturn = undefined, wrapperName = '' } = {}) => {
   const results = [];
 
   return Array(10)
@@ -30,33 +26,30 @@ const appendStep = (
     .map((value, index) => {
       const wrapperFn = async (pluginConfig, context) => {
         const {
-          options: { plugins },
+          options: { plugins }
         } = context;
         const pluginDefinition = plugins[index];
-        const pluginName = Array.isArray(pluginDefinition)
-          ? pluginDefinition[0]
-          : pluginDefinition;
+        const pluginName = Array.isArray(pluginDefinition) ? pluginDefinition[0] : pluginDefinition;
 
         if (index === plugins.length) {
           return stepFn(pluginConfig, {
             ...context,
-            stepResults: await Promise.all(results),
+            stepResults: await Promise.all(results)
           });
         }
 
         if (!pluginName) {
           return defaultReturn;
-        } else if (typeof pluginName !== 'string') {
+        }
+        if (typeof pluginName !== 'string') {
           throw new Error(
             `${
-              wrapperName ? wrapperName : 'semantic-release-plugin-decorators'
-            }: Incorrect plugin name type. Expected string but was ${JSON.stringify(
-              pluginName
-            )}.`
+              wrapperName || 'semantic-release-plugin-decorators'
+            }: Incorrect plugin name type. Expected string but was ${JSON.stringify(pluginName)}.`
           );
         }
 
-        const plugin = require(pluginName);
+        const plugin = await import(pluginName);
         const step = plugin && plugin[stepName];
 
         if (!step) {
@@ -73,5 +66,3 @@ const appendStep = (
       return wrapperFn;
     });
 };
-
-module.exports = appendStep;
