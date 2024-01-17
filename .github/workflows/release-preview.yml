@@ -12,4 +12,4 @@ jobs:
           node-version: 20
       # semantic-release dry-run workaround https://github.com/semantic-release/semantic-release/issues/1890#issuecomment-974512960
       - run: git checkout -b ${{ github.head_ref }}
-      - run: unset GITHUB_ACTIONS && yarn && yarn run semantic-release-github-pr --debug
+      - run: unset GITHUB_ACTIONS && npx semantic-release-github-pr --debug
